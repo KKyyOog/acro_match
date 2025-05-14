@@ -92,6 +92,15 @@ def find_matching_alb(sheet, area, experience_required, datetime_str):
                 matched.append(row.get("user_id"))
     return matched
 
+def ensure_headers_exist(sheet, base_headers, custom_fields):
+    current_headers = sheet.row_values(1)
+    expected_headers = base_headers + [field.get("label", "") for field in custom_fields]
+
+    if current_headers != expected_headers:
+        sheet.delete_row(1)  # 古いヘッダーを消して
+        sheet.insert_row(expected_headers, 1)  # 新しいヘッダーを書き込む
+
+
 # ------------------------ LINE通知 ------------------------
 
 LINE_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")
