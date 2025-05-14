@@ -30,9 +30,10 @@
     }
     button {
       background: {{ settings.button_color | default("#06c755") }};
-      color: white;
-      padding: 1rem;
-      border: none;
+        color: white;
+        padding: 1rem;
+        border: none;
+      }
       border-radius: 30px;
       width: 100%;
       font-size: 1rem;
@@ -87,5 +88,16 @@
 
     <button type="submit">送信</button>
   </form>
+  <label>{{ settings.form_label_name }}</label>
+<input type="text" name="name"><br>
+
+<label>{{ settings.form_label_area }}</label>
+<input type="text" name="area"><br>
+
+<label>{{ settings.form_label_available }}</label>
+<input type="text" name="available"><br>
+
+<button type="submit" style="background-color: {{ settings.button_color }};">送信</button>
+
 </body>
 </html>
