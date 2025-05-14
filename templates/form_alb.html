@@ -3,10 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>アルバイト登録フォーム</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script>
+    async function initializeLIFF() {
+      await liff.init({ liffId: "YOUR_LIFF_ID" }); // ← あなたのLIFF IDを入れてください
+      await liff.ready;
+      const profile = await liff.getProfile();
+      document.getElementById("user_id").value = profile.userId;
+    }
+
+    window.onload = () => {
+      initializeLIFF();
+    };
+  </script>
 </head>
 <body>
   <h2>バク転教室アルバイト 登録フォーム</h2>
   <form action="/submit_alb" method="post">
+    <!-- ユーザーIDをhiddenで渡す -->
+    <input type="hidden" id="user_id" name="user_id" value="">
+
     <label>お名前：<input type="text" name="name" required></label><br><br>
     <label>体操経験：
       <select name="gym">
