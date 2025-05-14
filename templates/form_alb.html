@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>アルバイト登録フォーム</title>
+  
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     async function initializeLIFF() {
@@ -45,5 +46,9 @@
 
     <button type="submit">送信</button>
   </form>
+  <!-- form_alb.html の一部 -->
+<h2>{{ settings.title }}</h2>
+<button type="submit" style="background: {{ settings.button_color|default:'#ffffff' }};">送信</button>
+
 </body>
 </html>
