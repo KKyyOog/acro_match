@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>アルバイト登録フォーム</title>
+</head>
+<body>
+  <h2>バク転教室アルバイト 登録フォーム</h2>
+  <form action="/submit_alb" method="post">
+    <label>お名前：<input type="text" name="name" required></label><br><br>
+    <label>体操経験：
+      <select name="gym">
+        <option value="あり">あり</option>
+        <option value="なし">なし</option>
+      </select>
+    </label><br><br>
+    <label>チア経験：
+      <select name="cheer">
+        <option value="あり">あり</option>
+        <option value="なし">なし</option>
+      </select>
+    </label><br><br>
+    <label>希望エリア：<input type="text" name="area" required></label><br><br>
+    <label>稼働可能日・時間：<input type="text" name="available" required></label><br><br>
+    <button type="submit">登録</button>
+  </form>
+</body>
+</html>
