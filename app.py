@@ -22,13 +22,17 @@ def admin():
     if request.method == 'POST':
         new_settings = {
             "title": request.form.get("title"),
-            "button_color": request.form.get("button_color")
+            "button_color": request.form.get("button_color"),
+            "form_label_name": request.form.get("form_label_name"),
+            "form_label_area": request.form.get("form_label_area"),
+            "form_label_available": request.form.get("form_label_available")
         }
         save_settings(new_settings)
         return redirect('/admin')
 
     current_settings = load_settings()
     return render_template('admin.html', settings=current_settings)
+
 
 # ------------------------ Google Sheets ------------------------
 

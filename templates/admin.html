@@ -6,14 +6,32 @@
 </head>
 <body>
   <h2>フォーム設定</h2>
-  <form method="post">
-    <label>タイトル：</label><br>
-    <input type="text" name="title" value="{{ settings.title }}"><br><br>
+  <form method="POST">
+  <label>タイトル:</label>
+  <input type="text" name="title" value="{{ settings.title }}"><br>
 
-    <label>ボタンカラー：</label><br>
-    <input type="color" name="button_color" value="{{ settings.button_color }}"><br><br>
+  <label>ボタンの色:</label>
+  <input type="color" name="button_color" value="{{ settings.button_color }}"><br>
 
-    <button type="submit">保存</button>
-  </form>
+  <label>名前ラベル:</label>
+  <input type="text" name="form_label_name" value="{{ settings.form_label_name }}"><br>
+
+  <label>エリアラベル:</label>
+  <input type="text" name="form_label_area" value="{{ settings.form_label_area }}"><br>
+
+  <label>出勤可能日ラベル:</label>
+  <input type="text" name="form_label_available" value="{{ settings.form_label_available }}"><br>
+
+  <input type="submit" value="保存">
+</form>
+<label>{{ settings.form_label_name }}</label>
+<input type="text" name="name"><br>
+
+<label>{{ settings.form_label_area }}</label>
+<input type="text" name="area"><br>
+
+<label>{{ settings.form_label_available }}</label>
+<input type="text" name="available"><br>
+
 </body>
 </html>
