@@ -25,38 +25,23 @@
     <input type="text" name="form_label_available" value="{{ settings.form_label_available }}"><br>
 
     <!-- カスタム項目 -->
-    <h3>カスタム項目の追加</h3>
-    <div id="custom-fields">
-      {% for field in settings.custom_fields or [] %}
-        <div>
-          <input type="text" name="custom_label_{{ loop.index }}" value="{{ field.label }}" placeholder="ラベル">
-          <input type="text" name="custom_name_{{ loop.index }}" value="{{ field.name }}" placeholder="name属性">
-        </div>
-      {% endfor %}
+<h3>カスタム項目の追加</h3>
+<div id="custom-fields">
+  {% for field in settings.custom_fields or [] %}
+    <div>
+      <input type="text" name="custom_label_{{ loop.index }}" value="{{ field.label }}" placeholder="ラベル">
+      <input type="text" name="custom_name_{{ loop.index }}" value="{{ field.name }}" placeholder="name属性">
     </div>
+  {% endfor %}
+</div>
 
-    <button type="button" onclick="addField()">＋ 項目を追加</button>
-    <input type="hidden" name="custom_count" id="custom_count" value="{{ settings.custom_fields | length }}">
+<button type="button" onclick="addField()">＋ 項目を追加</button>
+<input type="hidden" name="custom_count" id="custom_count" value="{{ settings.custom_fields | length }}">
 
-    <br><br>
-    <button type="submit">保存</button>
-  </form>
+<br><br>
 
-  <script>
-    let customCount = {{ settings.custom_fields | length }};
-    function addField() {
-      customCount++;
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <input type="text" name="custom_label_${customCount}" placeholder="ラベル">
-        <input type="text" name="custom_name_${customCount}" placeholder="name属性">
-      `;
-      document.getElementById("custom-fields").appendChild(div);
-      document.getElementById("custom_count").value = customCount;
-    }
-  </script>
-
-  <h3>教室フォーム設定</h3>
+<!-- 教室フォーム設定 -->
+<h3>教室フォーム設定</h3>
 <label>教室フォームタイトル：</label>
 <input type="text" name="classroom_title" value="{{ settings.classroom_title }}"><br>
 
@@ -71,6 +56,10 @@
 
 <label>希望する経験ラベル：</label>
 <input type="text" name="form_label_classroom_experience" value="{{ settings.form_label_classroom_experience }}"><br>
+
+<br><br>
+<button type="submit">保存</button>
+</form>
 
 </body>
 </html>

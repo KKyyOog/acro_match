@@ -57,6 +57,12 @@
       <option value="チアリーディング可">チアリーディング可</option>
     </select>
 
+   {% for field in settings.custom_fields %}
+    <label>{{ field.label }}</label>
+    <input type="text" name="{{ field.name }}">
+   {% endfor %}
+
+
     <button type="submit">送信</button>
   </form>
 </body>

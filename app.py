@@ -69,11 +69,15 @@ def admin():
 
 # ------------------------ Google Sheets ------------------------
 
-def get_sheet(sheet_name):
-    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
-    client = gspread.authorize(creds)
-    return client.open(sheet_name).sheet1
+sheet = get_sheet("アルバイト登録シート")
+
+# ヘッダーをチェック・整える
+base_headers = ["name", "gym", "cheer", "area", "available", "user_id"]
+ensure_headers_exist(sheet, base_headers, settings.get("custom_fields", []))
+
+row = [name, gym, cheer, area, available, user_id] + custom_values
+sheet.append_row(row)
+
 
 def find_matching_alb(sheet, area, experience_required, datetime_str):
     all_rows = sheet.get_all_records()
@@ -91,6 +95,10 @@ def find_matching_alb(sheet, area, experience_required, datetime_str):
             elif experience_required == "補助可能":
                 matched.append(row.get("user_id"))
     return matched
+
+def load_form_fields_from_sheet(sheet):
+    """ スプレッドシートの1行目を取得してフォーム項目として使う """
+    return sheet.row_values(1)
 
 def ensure_headers_exist(sheet, base_headers, custom_fields):
     current_headers = sheet.row_values(1)
@@ -168,8 +176,11 @@ def submit_alb():
         row = [name, gym, cheer, area, available, user_id] + custom_values
         sheet.append_row(row)
 
-        line_notify(user_id, f"{name}さん、アルバイト登録ありがとうございます！")
-        return "登録ありがとうございます！LINEに戻ってください。"
+        if user_id:
+            line_notify(user_id, f"{name}さん、アルバイト登録ありがとうございます！")
+        else:
+            print("⚠️ user_idがNoneです。LINE通知はスキップされました。")
+
 
     except Exception as e:
         print("❌ submit_alb エラー:", e)
