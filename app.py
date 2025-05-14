@@ -10,8 +10,24 @@ app = Flask(__name__)
 # ------------------------ 設定ファイル管理 ------------------------
 
 def load_settings():
-    with open("settings.json", "r", encoding="utf-8") as f:
-        return json.load(f)
+    default_settings = {
+        "title": "アルバイト登録",
+        "button_color": "#00b900",
+        "form_label_name": "お名前",
+        "form_label_area": "希望エリア",
+        "form_label_available": "出勤可能日",
+        "custom_fields": []
+    }
+    try:
+        with open("settings.json", "r", encoding="utf-8") as f:
+            saved = json.load(f)
+        if "custom_fields" not in saved:
+            saved["custom_fields"] = []
+        default_settings.update(saved)
+    except Exception as e:
+        print("⚠️ load_settings error:", e)
+    return default_settings
+
 
 def save_settings(data):
     with open("settings.json", "w", encoding="utf-8") as f:
