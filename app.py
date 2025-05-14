@@ -191,7 +191,7 @@ def submit_alb():
         return "Internal Server Error", 500
     
 
-@app.route('/募集一覧')
+@app.route('/recruit')
 def view_classrooms():
     settings = load_settings()
     sheet = get_sheet("教室登録シート")
