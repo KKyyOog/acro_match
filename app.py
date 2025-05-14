@@ -101,6 +101,9 @@ def register_alb():
 @app.route('/submit_alb', methods=['POST'])
 def submit_alb():
     try:
+        settings = load_settings()
+
+        # 基本項目の取得
         name = request.form.get('name')
         gym = request.form.get('gym')
         cheer = request.form.get('cheer')
@@ -108,12 +111,21 @@ def submit_alb():
         available = request.form.get('available')
         user_id = request.form.get('user_id')
 
-        # デバッグ用に表示（任意）
+        # カスタム項目の取得
+        custom_values = []
+        for field in settings.get("custom_fields", []):
+            value = request.form.get(field["name"], "")
+            custom_values.append(value)
+
+        # デバッグ出力
         print(f"🔍 name={name}, gym={gym}, cheer={cheer}, area={area}, available={available}, user_id={user_id}")
+        for i, field in enumerate(settings.get("custom_fields", [])):
+            print(f"📝 {field['label']} ({field['name']}): {custom_values[i]}")
 
         # スプレッドシートに保存
         sheet = get_sheet("アルバイト登録シート")
-        sheet.append_row([name, gym, cheer, area, available, user_id])
+        row = [name, gym, cheer, area, available, user_id] + custom_values
+        sheet.append_row(row)
 
         # LINE通知
         line_notify(user_id, f"{name}さん、アルバイト登録ありがとうございます！")
@@ -123,4 +135,5 @@ def submit_alb():
     except Exception as e:
         print("❌ submit_alb エラー:", e)
         return "Internal Server Error", 500
+
 

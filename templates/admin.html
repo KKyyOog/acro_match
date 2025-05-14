@@ -6,59 +6,54 @@
 </head>
 <body>
   <h2>フォーム設定</h2>
+
   <form method="POST">
-  <label>タイトル:</label>
-  <input type="text" name="title" value="{{ settings.title }}"><br>
+    <!-- 基本設定 -->
+    <label>タイトル:</label>
+    <input type="text" name="title" value="{{ settings.title }}"><br>
 
-  <label>ボタンの色:</label>
-  <input type="color" name="button_color" value="{{ settings.button_color }}"><br>
+    <label>ボタンの色:</label>
+    <input type="color" name="button_color" value="{{ settings.button_color }}"><br>
 
-  <label>名前ラベル:</label>
-  <input type="text" name="form_label_name" value="{{ settings.form_label_name }}"><br>
+    <label>名前ラベル:</label>
+    <input type="text" name="form_label_name" value="{{ settings.form_label_name }}"><br>
 
-  <label>エリアラベル:</label>
-  <input type="text" name="form_label_area" value="{{ settings.form_label_area }}"><br>
+    <label>エリアラベル:</label>
+    <input type="text" name="form_label_area" value="{{ settings.form_label_area }}"><br>
 
-  <label>出勤可能日ラベル:</label>
-  <input type="text" name="form_label_available" value="{{ settings.form_label_available }}"><br>
+    <label>出勤可能日ラベル:</label>
+    <input type="text" name="form_label_available" value="{{ settings.form_label_available }}"><br>
 
-  <input type="submit" value="保存">
-</form>
-<label>{{ settings.form_label_name }}</label>
-<input type="text" name="name"><br>
-
-<label>{{ settings.form_label_area }}</label>
-<input type="text" name="area"><br>
-
-<label>{{ settings.form_label_available }}</label>
-<input type="text" name="available"><br>
-<h3>カスタム項目の追加</h3>
-<div id="custom-fields">
-  {% for field in settings.custom_fields %}
-    <div>
-      <input type="text" name="custom_label_{{ loop.index }}" value="{{ field.label }}" placeholder="ラベル">
-      <input type="text" name="custom_name_{{ loop.index }}" value="{{ field.name }}" placeholder="name属性">
+    <!-- カスタム項目 -->
+    <h3>カスタム項目の追加</h3>
+    <div id="custom-fields">
+      {% for field in settings.custom_fields or [] %}
+        <div>
+          <input type="text" name="custom_label_{{ loop.index }}" value="{{ field.label }}" placeholder="ラベル">
+          <input type="text" name="custom_name_{{ loop.index }}" value="{{ field.name }}" placeholder="name属性">
+        </div>
+      {% endfor %}
     </div>
-  {% endfor %}
-</div>
-<button type="button" onclick="addField()">＋ 項目を追加</button>
 
-<input type="hidden" name="custom_count" id="custom_count" value="{{ settings.custom_fields | length }}">
+    <button type="button" onclick="addField()">＋ 項目を追加</button>
+    <input type="hidden" name="custom_count" id="custom_count" value="{{ settings.custom_fields | length }}">
 
-<script>
-  let customCount = {{ settings.custom_fields | length }};
-  function addField() {
-    customCount++;
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <input type="text" name="custom_label_${customCount}" placeholder="ラベル">
-      <input type="text" name="custom_name_${customCount}" placeholder="name属性">
-    `;
-    document.getElementById("custom-fields").appendChild(div);
-    document.getElementById("custom_count").value = customCount;
-  }
-</script>
+    <br><br>
+    <button type="submit">保存</button>
+  </form>
 
-
+  <script>
+    let customCount = {{ settings.custom_fields | length }};
+    function addField() {
+      customCount++;
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <input type="text" name="custom_label_${customCount}" placeholder="ラベル">
+        <input type="text" name="custom_name_${customCount}" placeholder="name属性">
+      `;
+      document.getElementById("custom-fields").appendChild(div);
+      document.getElementById("custom_count").value = customCount;
+    }
+  </script>
 </body>
 </html>
