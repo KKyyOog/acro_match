@@ -158,7 +158,7 @@ def submit():
 
     try:
         sheet = get_sheet("教室登録シート")
-        sheet.append_row([name, location, datetime_str, experience])
+        sheet.append_row([name, location, datetime_str, experience, user_id])
         return "教室登録と通知が完了しました！LINEに戻ってください。"
     except Exception as e:
         print(f"❌ 教室登録エラー: {e}")
