@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>管理画面</title>
+</head>
+<body>
+  <h2>フォーム設定</h2>
+  <form method="post">
+    <label>タイトル：</label><br>
+    <input type="text" name="title" value="{{ settings.title }}"><br><br>
+
+    <label>ボタンカラー：</label><br>
+    <input type="color" name="button_color" value="{{ settings.button_color }}"><br><br>
+
+    <button type="submit">保存</button>
+  </form>
+</body>
+</html>
