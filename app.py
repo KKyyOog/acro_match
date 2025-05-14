@@ -189,3 +189,12 @@ def submit_alb():
     except Exception as e:
         print(f"❌ submit_alb エラー: {e}")
         return "Internal Server Error", 500
+    
+
+@app.route('/募集一覧')
+def view_classrooms():
+    settings = load_settings()
+    sheet = get_sheet("教室登録シート")
+    headers = sheet.row_values(1)
+    rows = sheet.get_all_values()[1:]  # 1行目はヘッダーなのでスキップ
+    return render_template('view_classrooms.html', headers=headers, rows=rows, settings=settings)
