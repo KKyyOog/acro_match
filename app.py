@@ -10,6 +10,7 @@ app = Flask(__name__)
 # ------------------------ 設定ファイル管理 ------------------------
 
 def load_settings():
+    """Load settings from a JSON file with default fallback."""
     default_settings = {
         "title": "アルバイト登録",
         "button_color": "#00b900",
@@ -26,20 +27,22 @@ def load_settings():
     try:
         with open("settings.json", "r", encoding="utf-8") as f:
             saved = json.load(f)
-        for key in default_settings:
-            if key not in saved:
-                saved[key] = default_settings[key]
-        return saved
+        return {**default_settings, **saved}
     except Exception as e:
-        print("⚠️ load_settings error:", e)
+        print(f"⚠️ load_settings error: {e}")
         return default_settings
 
 def save_settings(data):
-    with open("settings.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    """Save settings to a JSON file."""
+    try:
+        with open("settings.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"⚠️ save_settings error: {e}")
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
+    """Admin page for updating settings."""
     if request.method == 'POST':
         new_settings = {
             "title": request.form.get("title"),
@@ -69,51 +72,42 @@ def admin():
 
 # ------------------------ Google Sheets ------------------------
 
-sheet = get_sheet("アルバイト登録シート")
-
-# ヘッダーをチェック・整える
-base_headers = ["name", "gym", "cheer", "area", "available", "user_id"]
-ensure_headers_exist(sheet, base_headers, settings.get("custom_fields", []))
-
-row = [name, gym, cheer, area, available, user_id] + custom_values
-sheet.append_row(row)
-
-
-def find_matching_alb(sheet, area, experience_required, datetime_str):
-    all_rows = sheet.get_all_records()
-    matched = []
-    for row in all_rows:
-        user_area = row.get("area", "")
-        user_available = row.get("available", "")
-        user_gym = row.get("gym", "")
-        user_cheer = row.get("cheer", "")
-        if area in user_area and datetime_str[:10] in user_available:
-            if experience_required == "体操経験者" and user_gym == "あり":
-                matched.append(row.get("user_id"))
-            elif experience_required == "チアリーディング可" and user_cheer == "あり":
-                matched.append(row.get("user_id"))
-            elif experience_required == "補助可能":
-                matched.append(row.get("user_id"))
-    return matched
-
-def load_form_fields_from_sheet(sheet):
-    """ スプレッドシートの1行目を取得してフォーム項目として使う """
-    return sheet.row_values(1)
+def get_sheet(sheet_name):
+    """Authenticate and return a Google Sheet."""
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+    client = gspread.authorize(creds)
+    return client.open(sheet_name).sheet1
 
 def ensure_headers_exist(sheet, base_headers, custom_fields):
+    """Ensure the sheet has the correct headers."""
     current_headers = sheet.row_values(1)
     expected_headers = base_headers + [field.get("label", "") for field in custom_fields]
 
     if current_headers != expected_headers:
-        sheet.delete_row(1)  # 古いヘッダーを消して
-        sheet.insert_row(expected_headers, 1)  # 新しいヘッダーを書き込む
+        sheet.delete_row(1)  # Remove old headers
+        sheet.insert_row(expected_headers, 1)  # Insert new headers
 
+def find_matching_alb(sheet, area, experience_required, datetime_str):
+    """Find matching users based on area, experience, and availability."""
+    all_rows = sheet.get_all_records()
+    matched = []
+    for row in all_rows:
+        if area in row.get("area", "") and datetime_str[:10] in row.get("available", ""):
+            if experience_required == "体操経験者" and row.get("gym") == "あり":
+                matched.append(row.get("user_id"))
+            elif experience_required == "チアリーディング可" and row.get("cheer") == "あり":
+                matched.append(row.get("user_id"))
+            elif experience_required == "補助可能":
+                matched.append(row.get("user_id"))
+    return matched
 
 # ------------------------ LINE通知 ------------------------
 
 LINE_ACCESS_TOKEN = os.environ.get("LINE_ACCESS_TOKEN")
 
 def line_notify(to, message):
+    """Send a LINE notification."""
     url = "https://api.line.me/v2/bot/message/push"
     headers = {
         "Content-Type": "application/json",
@@ -123,41 +117,46 @@ def line_notify(to, message):
         "to": to,
         "messages": [{"type": "text", "text": message}]
     }
-    requests.post(url, headers=headers, json=body)
+    try:
+        requests.post(url, headers=headers, json=body)
+    except Exception as e:
+        print(f"⚠️ LINE通知エラー: {e}")
 
 # ------------------------ 教室側 ------------------------
 
 @app.route('/')
 def index():
+    """Render the classroom registration form."""
     settings = load_settings()
     return render_template('form_classroom.html', settings=settings)
 
 @app.route('/submit', methods=['POST'])
 def submit():
+    """Handle classroom registration form submission."""
     name = request.form.get('name')
     location = request.form.get('location')
     datetime_str = request.form.get('date')
     experience = request.form.get('experience')
 
-    sheet = get_sheet("教室登録シート")
-    sheet.append_row([name, location, datetime_str, experience])
-
-    alb_sheet = get_sheet("アルバイト登録シート")
-    matched_users = find_matching_alb(alb_sheet, location, experience, datetime_str)
-    for user_id in matched_users:
-        line_notify(user_id, f"{location}で {experience} 向けのアルバイト募集があります！応募はこちら ▶ https://...")
-
-    return "教室登録と通知が完了しました！LINEに戻ってください。"
+    try:
+        sheet = get_sheet("教室登録シート")
+        sheet.append_row([name, location, datetime_str, experience])
+        return "教室登録と通知が完了しました！LINEに戻ってください。"
+    except Exception as e:
+        print(f"❌ 教室登録エラー: {e}")
+        return "Internal Server Error", 500
 
 # ------------------------ アルバイト側 ------------------------
 
 @app.route('/register_alb')
 def register_alb():
+    """Render the part-time job registration form."""
     settings = load_settings()
     return render_template('form_alb.html', settings=settings)
 
 @app.route('/submit_alb', methods=['POST'])
 def submit_alb():
+    """Handle part-time job registration form submission."""
     try:
         settings = load_settings()
         name = request.form.get('name')
@@ -167,21 +166,26 @@ def submit_alb():
         available = request.form.get('available')
         user_id = request.form.get('user_id')
 
-        custom_values = []
-        for field in settings.get("custom_fields", []):
-            value = request.form.get(field.get("name", ""), "")
-            custom_values.append(value)
+        custom_values = [
+            request.form.get(field.get("name", ""), "")
+            for field in settings.get("custom_fields", [])
+        ]
 
         sheet = get_sheet("アルバイト登録シート")
         row = [name, gym, cheer, area, available, user_id] + custom_values
         sheet.append_row(row)
+
+        # Notify users
+        matched_users = find_matching_alb(sheet, area, "補助可能", available)
+        for matched_user_id in matched_users:
+            line_notify(matched_user_id, f"{area}でアルバイト募集があります！応募はこちら ▶ https://...")
 
         if user_id:
             line_notify(user_id, f"{name}さん、アルバイト登録ありがとうございます！")
         else:
             print("⚠️ user_idがNoneです。LINE通知はスキップされました。")
 
-
+        return "登録が完了しました！"
     except Exception as e:
-        print("❌ submit_alb エラー:", e)
+        print(f"❌ submit_alb エラー: {e}")
         return "Internal Server Error", 500
