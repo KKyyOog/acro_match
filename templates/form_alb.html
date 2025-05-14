@@ -6,7 +6,7 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     async function initializeLIFF() {
-      await liff.init({ liffId: "YOUR_LIFF_ID" }); // ← あなたのLIFF IDを入れてください
+      await liff.init({ liffId: "2007411501-PmxqWykX" }); // ここに自分のLIFF IDを入れてください
       await liff.ready;
       const profile = await liff.getProfile();
       document.getElementById("user_id").value = profile.userId;
@@ -18,27 +18,32 @@
   </script>
 </head>
 <body>
-  <h2>バク転教室アルバイト 登録フォーム</h2>
+  <h2>アルバイト登録フォーム</h2>
   <form action="/submit_alb" method="post">
-    <!-- ユーザーIDをhiddenで渡す -->
-    <input type="hidden" id="user_id" name="user_id" value="">
+    <!-- hidden フィールドで userId を渡す -->
+    <input type="hidden" name="user_id" id="user_id" value="">
 
     <label>お名前：<input type="text" name="name" required></label><br><br>
+    
     <label>体操経験：
       <select name="gym">
         <option value="あり">あり</option>
         <option value="なし">なし</option>
       </select>
     </label><br><br>
+
     <label>チア経験：
       <select name="cheer">
         <option value="あり">あり</option>
         <option value="なし">なし</option>
       </select>
     </label><br><br>
+
     <label>希望エリア：<input type="text" name="area" required></label><br><br>
+
     <label>稼働可能日・時間：<input type="text" name="available" required></label><br><br>
-    <button type="submit">登録</button>
+
+    <button type="submit">送信</button>
   </form>
 </body>
 </html>
