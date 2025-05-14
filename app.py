@@ -22,13 +22,17 @@ def admin():
     if request.method == 'POST':
         new_settings = {
             "title": request.form.get("title"),
-            "button_color": request.form.get("button_color")
+            "button_color": request.form.get("button_color"),
+            "form_label_name": request.form.get("form_label_name"),
+            "form_label_area": request.form.get("form_label_area"),
+            "form_label_available": request.form.get("form_label_available")
         }
         save_settings(new_settings)
         return redirect('/admin')
 
     current_settings = load_settings()
     return render_template('admin.html', settings=current_settings)
+
 
 # ------------------------ Google Sheets ------------------------
 
@@ -81,7 +85,27 @@ def register_alb():
 
 @app.route('/submit_alb', methods=['POST'])
 def submit_alb():
-    name = request.form.get('name')
-    gym = request.form.get('gym')
-    cheer = request.form.get('cheer')
-    area = request.form.get('area')
+    try:
+        name = request.form.get('name')
+        gym = request.form.get('gym')
+        cheer = request.form.get('cheer')
+        area = request.form.get('area')
+        available = request.form.get('available')
+        user_id = request.form.get('user_id')
+
+        # デバッグ用に表示（任意）
+        print(f"🔍 name={name}, gym={gym}, cheer={cheer}, area={area}, available={available}, user_id={user_id}")
+
+        # スプレッドシートに保存
+        sheet = get_sheet("アルバイト登録シート")
+        sheet.append_row([name, gym, cheer, area, available, user_id])
+
+        # LINE通知
+        line_notify(user_id, f"{name}さん、アルバイト登録ありがとうございます！")
+
+        return "登録ありがとうございます！LINEに戻ってください。"
+
+    except Exception as e:
+        print("❌ submit_alb エラー:", e)
+        return "Internal Server Error", 500
+
