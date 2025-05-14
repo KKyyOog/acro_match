@@ -1,10 +1,20 @@
 from flask import Flask, request, render_template
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return render_template('form.html')
+
+def get_sheet(sheet_name):
+    scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+    creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    client = gspread.authorize(creds)
+    return client.open(sheet_name).sheet1
+
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -13,8 +23,11 @@ def submit():
     date = request.form.get('date')
     experience = request.form.get('experience')
 
-    print(f"教室名: {name}, 場所: {location}, 日時: {date}, 希望条件: {experience}")
+    sheet = get_sheet("教室登録シート")
+    sheet.append_row([name, location, date, experience])
+
     return "送信が完了しました！LINEに戻ってください。"
+
 
 if __name__ == '__main__':
     app.run(debug=True)
@@ -36,5 +49,8 @@ def submit_alb():
     area = request.form.get('area')
     available = request.form.get('available')
 
-    print(f"[アルバイト登録] 名前: {name}, 体操: {gym}, チア: {cheer}, エリア: {area}, 稼働可能: {available}")
+    sheet = get_sheet("アルバイト登録シート")
+    sheet.append_row([name, gym, cheer, area, available])
+
     return "登録ありがとうございます！LINEに戻ってください。"
+
