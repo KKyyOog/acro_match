@@ -1,22 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>教室登録フォーム</title>
+  <title>{{ settings.classroom_title | default("教室登録フォーム") }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      background: #f4f4f9;
+      color: #333;
+      padding: 2rem;
+    }
+    form {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    input, select {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.6rem 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      background: {{ settings.button_color | default("#06c755") }};
+      color: white;
+      padding: 1rem;
+      border: none;
+      border-radius: 30px;
+      width: 100%;
+      font-size: 1rem;
+    }
+  </style>
 </head>
 <body>
-  <h2>バク転教室 登録フォーム</h2>
   <form action="/submit" method="post">
-    <label>教室名：<input type="text" name="name" required></label><br><br>
-    <label>場所：<input type="text" name="location" required></label><br><br>
-    <label>募集日時：<input type="datetime-local" name="date" required></label><br><br>
-    <label>希望する経験：
-      <select name="experience">
-        <option value="体操経験者">体操経験者</option>
-        <option value="補助可能">補助可能</option>
-        <option value="チアリーディング可">チアリーディング可</option>
-      </select>
-    </label><br><br>
+    <h2 style="text-align: center;">{{ settings.classroom_title | default("教室登録フォーム") }}</h2>
+
+    <label for="name">{{ settings.form_label_classroom_name | default("教室名") }}</label>
+    <input type="text" name="name" id="name" required>
+
+    <label for="location">{{ settings.form_label_classroom_location | default("場所") }}</label>
+    <input type="text" name="location" id="location" required>
+
+    <label for="date">{{ settings.form_label_classroom_date | default("募集日時") }}</label>
+    <input type="datetime-local" name="date" id="date" required>
+
+    <label for="experience">{{ settings.form_label_classroom_experience | default("希望する経験") }}</label>
+    <select name="experience" id="experience">
+      <option value="体操経験者">体操経験者</option>
+      <option value="補助可能">補助可能</option>
+      <option value="チアリーディング可">チアリーディング可</option>
+    </select>
+
     <button type="submit">送信</button>
   </form>
 </body>

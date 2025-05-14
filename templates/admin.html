@@ -55,5 +55,22 @@
       document.getElementById("custom_count").value = customCount;
     }
   </script>
+
+  <h3>教室フォーム設定</h3>
+<label>教室フォームタイトル：</label>
+<input type="text" name="classroom_title" value="{{ settings.classroom_title }}"><br>
+
+<label>教室名ラベル：</label>
+<input type="text" name="form_label_classroom_name" value="{{ settings.form_label_classroom_name }}"><br>
+
+<label>場所ラベル：</label>
+<input type="text" name="form_label_classroom_location" value="{{ settings.form_label_classroom_location }}"><br>
+
+<label>募集日時ラベル：</label>
+<input type="text" name="form_label_classroom_date" value="{{ settings.form_label_classroom_date }}"><br>
+
+<label>希望する経験ラベル：</label>
+<input type="text" name="form_label_classroom_experience" value="{{ settings.form_label_classroom_experience }}"><br>
+
 </body>
 </html>

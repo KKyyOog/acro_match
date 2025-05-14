@@ -16,17 +16,23 @@ def load_settings():
         "form_label_name": "お名前",
         "form_label_area": "希望エリア",
         "form_label_available": "出勤可能日",
-        "custom_fields": []
+        "custom_fields": [],
+        "classroom_title": "教室登録フォーム",
+        "form_label_classroom_name": "教室名",
+        "form_label_classroom_location": "場所",
+        "form_label_classroom_date": "募集日時",
+        "form_label_classroom_experience": "希望する経験"
     }
     try:
         with open("settings.json", "r", encoding="utf-8") as f:
             saved = json.load(f)
-        if "custom_fields" not in saved:
-            saved["custom_fields"] = []
-        default_settings.update(saved)
+        for key in default_settings:
+            if key not in saved:
+                saved[key] = default_settings[key]
+        return saved
     except Exception as e:
         print("⚠️ load_settings error:", e)
-    return default_settings
+        return default_settings
 
 def save_settings(data):
     with open("settings.json", "w", encoding="utf-8") as f:
@@ -41,6 +47,11 @@ def admin():
             "form_label_name": request.form.get("form_label_name"),
             "form_label_area": request.form.get("form_label_area"),
             "form_label_available": request.form.get("form_label_available"),
+            "classroom_title": request.form.get("classroom_title"),
+            "form_label_classroom_name": request.form.get("form_label_classroom_name"),
+            "form_label_classroom_location": request.form.get("form_label_classroom_location"),
+            "form_label_classroom_date": request.form.get("form_label_classroom_date"),
+            "form_label_classroom_experience": request.form.get("form_label_classroom_experience"),
             "custom_fields": []
         }
         custom_count = int(request.form.get("custom_count", 0))
@@ -64,14 +75,21 @@ def get_sheet(sheet_name):
     client = gspread.authorize(creds)
     return client.open(sheet_name).sheet1
 
-def find_matching_alb(sheet, area, gym_required, available_day):
+def find_matching_alb(sheet, area, experience_required, datetime_str):
     all_rows = sheet.get_all_records()
     matched = []
     for row in all_rows:
-        if area in row.get("area", "") and \
-           (not gym_required or row.get("gym") == "あり") and \
-           available_day in row.get("available", ""):
-            matched.append(row.get("user_id"))
+        user_area = row.get("area", "")
+        user_available = row.get("available", "")
+        user_gym = row.get("gym", "")
+        user_cheer = row.get("cheer", "")
+        if area in user_area and datetime_str[:10] in user_available:
+            if experience_required == "体操経験者" and user_gym == "あり":
+                matched.append(row.get("user_id"))
+            elif experience_required == "チアリーディング可" and user_cheer == "あり":
+                matched.append(row.get("user_id"))
+            elif experience_required == "補助可能":
+                matched.append(row.get("user_id"))
     return matched
 
 # ------------------------ LINE通知 ------------------------
@@ -94,25 +112,25 @@ def line_notify(to, message):
 
 @app.route('/')
 def index():
-    return render_template('form.html')
+    settings = load_settings()
+    return render_template('form_classroom.html', settings=settings)
 
 @app.route('/submit', methods=['POST'])
 def submit():
     name = request.form.get('name')
     location = request.form.get('location')
-    date = request.form.get('date')
+    datetime_str = request.form.get('date')
     experience = request.form.get('experience')
 
     sheet = get_sheet("教室登録シート")
-    sheet.append_row([name, location, date, experience])
+    sheet.append_row([name, location, datetime_str, experience])
 
-    # マッチング処理をここで呼び出し
     alb_sheet = get_sheet("アルバイト登録シート")
-    matched_users = find_matching_alb(alb_sheet, location, gym_required=(experience == "あり"), available_day=date)
+    matched_users = find_matching_alb(alb_sheet, location, experience, datetime_str)
     for user_id in matched_users:
-        line_notify(user_id, f"{location}エリアの体操バイト募集があります！応募はこちら ▶ https://...")
+        line_notify(user_id, f"{location}で {experience} 向けのアルバイト募集があります！応募はこちら ▶ https://...")
 
-    return "送信が完了しました！LINEに戻ってください。"
+    return "教室登録と通知が完了しました！LINEに戻ってください。"
 
 # ------------------------ アルバイト側 ------------------------
 
