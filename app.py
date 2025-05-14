@@ -1,13 +1,14 @@
 from flask import Flask, request, render_template
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-
+import requests
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return render_template('form.html')
+
 
 def get_sheet(sheet_name):
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
@@ -48,9 +49,35 @@ def submit_alb():
     cheer = request.form.get('cheer')
     area = request.form.get('area')
     available = request.form.get('available')
+    user_id = request.form.get('user_id')  # ← ここ！
 
+    # スプレッドシート保存処理
     sheet = get_sheet("アルバイト登録シート")
-    sheet.append_row([name, gym, cheer, area, available])
+    sheet.append_row([name, gym, cheer, area, available, user_id])
+
+    # LINE通知（例：登録完了メッセージ）
+    line_notify(user_id, f"{name}さん、アルバイト登録ありがとうございます！")
 
     return "登録ありがとうございます！LINEに戻ってください。"
 
+# 起動時に1回だけスプレッドシートにアクセスして確認
+#with app.app_context():
+    try:
+        test_sheet = get_sheet("アルバイト登録シート")
+        print("✅ アルバイト登録シートが読み込めました")
+    except Exception as e:
+        print("❌ スプレッドシート読み込みエラー:", e)
+
+LINE_ACCESS_TOKEN = "DQYbFCXOYukaAExWorAWCqS9Ni1RMMzR9YYfhMdCBMeIgb7uUE8cYlwYGOlPP/7ZNTCcf28Df4w9yORDnEZ5PIbJF+3kOIK8sWyGylCFdou1VhyWZ6xva3ipZNr5Jyei8styM1xBFDxLwsBaA9F76gdB04t89/1O/w1cDnyilFU="  # ← あなたのアクセストークン
+
+def line_notify(to, message):
+    url = "https://api.line.me/v2/bot/message/push"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
+    }
+    body = {
+        "to": to,
+        "messages": [{"type": "text", "text": message}]
+    }
+    requests.post(url, headers=headers, json=body)
