@@ -10,6 +10,8 @@
     th { background-color: #f0f0f0; }
     h1 { text-align: center; margin-bottom: 1.5rem; }
   </style>
+
+  
 </head>
 <body>
   <h1>{{ settings.classroom_title | default("教室登録一覧") }}</h1>
@@ -33,4 +35,21 @@
     </tbody>
   </table>
 </body>
+<tbody>
+  {% for row in rows %}
+    <tr>
+      {% for cell in row %}
+        <td>{{ cell }}</td>
+      {% endfor %}
+      <td>
+        <form action="/notify_school" method="POST">
+          <input type="hidden" name="school_user_id" value="{{ row[-1] }}">  <!-- 最後の列をLINE IDと仮定 -->
+          <input type="hidden" name="school_name" value="{{ row[0] }}">      <!-- 教室名 -->
+          <button type="submit">興味あり</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+</tbody>
+
 </html>

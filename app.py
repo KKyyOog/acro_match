@@ -122,6 +122,23 @@ def line_notify(to, message):
     except Exception as e:
         print(f"⚠️ LINE通知エラー: {e}")
 
+
+@app.route('/notify_school', methods=['POST'])
+def notify_school():
+    school_user_id = request.form.get("school_user_id")
+    school_name = request.form.get("school_name")
+    
+    # 仮：ログインしたアルバイトの名前を取得（本来はセッションなどで）
+    # 今は固定値で仮対応
+    alb_name = "アルバイト（仮）"
+
+    if school_user_id:
+        line_notify(school_user_id, f"{alb_name}さんが『{school_name}』の募集に興味を持っています！")
+        return "通知を送信しました。戻るボタンで一覧に戻ってください。"
+    else:
+        return "エラー：通知先が不明です", 400
+
+
 # ------------------------ 教室側 ------------------------
 
 @app.route('/')
@@ -137,6 +154,7 @@ def submit():
     location = request.form.get('location')
     datetime_str = request.form.get('date')
     experience = request.form.get('experience')
+    user_id = request.form.get('user_id')
 
     try:
         sheet = get_sheet("教室登録シート")

@@ -36,10 +36,27 @@
       font-size: 1rem;
     }
   </style>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+  async function initializeLiff() {
+    await liff.init({ liffId: "2007411501-XpedmZEQ" }); // ←ここを自分のLIFF IDに
+    if (!liff.isLoggedIn()) {
+      liff.login();
+    } else {
+      const profile = await liff.getProfile();
+      document.getElementById("user_id").value = profile.userId;
+    }
+  }
+  window.onload = initializeLiff;
+</script>
+
 </head>
 <body>
   <form action="/submit" method="post">
     <h2 style="text-align: center;">{{ settings.classroom_title | default("教室登録フォーム") }}</h2>
+
+    <input type="hidden" name="user_id" id="user_id">
 
     <label for="name">{{ settings.form_label_classroom_name | default("教室名") }}</label>
     <input type="text" name="name" id="name" required>
