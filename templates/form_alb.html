@@ -1,16 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>アルバイト登録フォーム</title>
+  <title>{{ settings.title | default("フォーム") }}</title>
   
+  <!-- フォントとCSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      background: #f4f4f9;
+      color: #333;
+      padding: 2rem;
+    }
+    form {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    input, select {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.6rem 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      background: {{ settings.button_color | default("#06c755") }};
+      color: white;
+      padding: 1rem;
+      border: none;
+      border-radius: 30px;
+      width: 100%;
+      font-size: 1rem;
+    }
+  </style>
+
+  <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     async function initializeLIFF() {
-      await liff.init({ liffId: "2007411501-PmxqWykX" }); // ここに自分のLIFF IDを入れてください
-      await liff.ready;
-      const profile = await liff.getProfile();
-      document.getElementById("user_id").value = profile.userId;
+      try {
+        await liff.init({ liffId: "2007411501-PmxqWykX" });
+        await liff.ready;
+        const profile = await liff.getProfile();
+        document.getElementById("user_id").value = profile.userId;
+      } catch (error) {
+        console.error("LIFF initialization failed:", error);
+      }
     }
 
     window.onload = () => {
@@ -19,36 +59,33 @@
   </script>
 </head>
 <body>
-  <h2>アルバイト登録フォーム</h2>
   <form action="/submit_alb" method="post">
-    <!-- hidden フィールドで userId を渡す -->
+    <h2 style="text-align:center;">{{ settings.title | default("フォーム") }}</h2>
+
     <input type="hidden" name="user_id" id="user_id" value="">
 
-    <label>お名前：<input type="text" name="name" required></label><br><br>
-    
-    <label>体操経験：
-      <select name="gym">
-        <option value="あり">あり</option>
-        <option value="なし">なし</option>
-      </select>
-    </label><br><br>
+    <label for="name">お名前：</label>
+    <input type="text" name="name" id="name" required>
 
-    <label>チア経験：
-      <select name="cheer">
-        <option value="あり">あり</option>
-        <option value="なし">なし</option>
-      </select>
-    </label><br><br>
+    <label for="gym">体操経験：</label>
+    <select name="gym" id="gym">
+      <option value="あり">あり</option>
+      <option value="なし">なし</option>
+    </select>
 
-    <label>希望エリア：<input type="text" name="area" required></label><br><br>
+    <label for="cheer">チア経験：</label>
+    <select name="cheer" id="cheer">
+      <option value="あり">あり</option>
+      <option value="なし">なし</option>
+    </select>
 
-    <label>稼働可能日・時間：<input type="text" name="available" required></label><br><br>
+    <label for="area">希望エリア：</label>
+    <input type="text" name="area" id="area" required>
+
+    <label for="available">稼働可能日・時間：</label>
+    <input type="text" name="available" id="available" required>
 
     <button type="submit">送信</button>
   </form>
-  <!-- form_alb.html の一部 -->
-<h2>{{ settings.title }}</h2>
-<button type="submit" style="background: {{ settings.button_color|default:'#ffffff' }};">送信</button>
-
 </body>
 </html>
