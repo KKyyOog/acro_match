@@ -81,7 +81,27 @@ def register_alb():
 
 @app.route('/submit_alb', methods=['POST'])
 def submit_alb():
-    name = request.form.get('name')
-    gym = request.form.get('gym')
-    cheer = request.form.get('cheer')
-    area = request.form.get('area')
+    try:
+        name = request.form.get('name')
+        gym = request.form.get('gym')
+        cheer = request.form.get('cheer')
+        area = request.form.get('area')
+        available = request.form.get('available')
+        user_id = request.form.get('user_id')
+
+        # デバッグ用に表示（任意）
+        print(f"🔍 name={name}, gym={gym}, cheer={cheer}, area={area}, available={available}, user_id={user_id}")
+
+        # スプレッドシートに保存
+        sheet = get_sheet("アルバイト登録シート")
+        sheet.append_row([name, gym, cheer, area, available, user_id])
+
+        # LINE通知
+        line_notify(user_id, f"{name}さん、アルバイト登録ありがとうございます！")
+
+        return "登録ありがとうございます！LINEに戻ってください。"
+
+    except Exception as e:
+        print("❌ submit_alb エラー:", e)
+        return "Internal Server Error", 500
+
