@@ -32,6 +32,33 @@
 
 <label>{{ settings.form_label_available }}</label>
 <input type="text" name="available"><br>
+<h3>カスタム項目の追加</h3>
+<div id="custom-fields">
+  {% for field in settings.custom_fields %}
+    <div>
+      <input type="text" name="custom_label_{{ loop.index }}" value="{{ field.label }}" placeholder="ラベル">
+      <input type="text" name="custom_name_{{ loop.index }}" value="{{ field.name }}" placeholder="name属性">
+    </div>
+  {% endfor %}
+</div>
+<button type="button" onclick="addField()">＋ 項目を追加</button>
+
+<input type="hidden" name="custom_count" id="custom_count" value="{{ settings.custom_fields | length }}">
+
+<script>
+  let customCount = {{ settings.custom_fields | length }};
+  function addField() {
+    customCount++;
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <input type="text" name="custom_label_${customCount}" placeholder="ラベル">
+      <input type="text" name="custom_name_${customCount}" placeholder="name属性">
+    `;
+    document.getElementById("custom-fields").appendChild(div);
+    document.getElementById("custom_count").value = customCount;
+  }
+</script>
+
 
 </body>
 </html>

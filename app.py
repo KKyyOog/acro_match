@@ -20,18 +20,33 @@ def save_settings(data):
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if request.method == 'POST':
+        # 基本設定の取得
         new_settings = {
             "title": request.form.get("title"),
             "button_color": request.form.get("button_color"),
             "form_label_name": request.form.get("form_label_name"),
             "form_label_area": request.form.get("form_label_area"),
-            "form_label_available": request.form.get("form_label_available")
+            "form_label_available": request.form.get("form_label_available"),
+            "custom_fields": []
         }
+
+        # カスタム項目の数を取得してループ
+        custom_count = int(request.form.get("custom_count", 0))
+        for i in range(1, custom_count + 1):
+            label = request.form.get(f"custom_label_{i}")
+            name = request.form.get(f"custom_name_{i}")
+            if label and name:
+                new_settings["custom_fields"].append({
+                    "label": label,
+                    "name": name
+                })
+
         save_settings(new_settings)
         return redirect('/admin')
 
     current_settings = load_settings()
     return render_template('admin.html', settings=current_settings)
+
 
 
 # ------------------------ Google Sheets ------------------------

@@ -85,6 +85,9 @@
     <label for="available">{{ settings.form_label_available | default("稼働可能日・時間") }}</label>
     <input type="text" name="available" id="available" required>
 
+    <label for="{{ field.name }}">{{ field.label }}</label>
+    <input type="text" name="{{ field.name }}" id="{{ field.name }}">
+
     <button type="submit">送信</button>
   </form>
 </body>
