@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ settings.classroom_title | default("教室登録フォーム") }}</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New&display=swap" rel="stylesheet">
   <style>
@@ -36,21 +37,24 @@
       font-size: 1rem;
     }
   </style>
-
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-<script>
-  async function initializeLiff() {
-    await liff.init({ liffId: "2007411501-XpedmZEQ" }); // ←ここを自分のLIFF IDに
-    if (!liff.isLoggedIn()) {
-      liff.login();
-    } else {
-      const profile = await liff.getProfile();
-      document.getElementById("user_id").value = profile.userId;
+  <script>
+    async function initializeLIFF() {
+      try {
+        await liff.init({ liffId: "YOUR_LIFF_ID" });
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        } else {
+          const profile = await liff.getProfile();
+          console.log("✅ LINE Profile:", profile);
+          document.getElementById("user_id").value = profile.userId;
+        }
+      } catch (error) {
+        console.error("LIFF initialization failed:", error);
+      }
     }
-  }
-  window.onload = initializeLiff;
-</script>
-
+    window.onload = initializeLIFF;
+  </script>
 </head>
 <body>
   <form action="/submit" method="post">
@@ -74,11 +78,10 @@
       <option value="チアリーディング可">チアリーディング可</option>
     </select>
 
-   {% for field in settings.custom_fields %}
-    <label>{{ field.label }}</label>
-    <input type="text" name="{{ field.name }}">
-   {% endfor %}
-
+    {% for field in settings.custom_fields %}
+      <label>{{ field.label }}</label>
+      <input type="text" name="{{ field.name }}">
+    {% endfor %}
 
     <button type="submit">送信</button>
   </form>

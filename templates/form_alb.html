@@ -2,9 +2,8 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ settings.title | default("フォーム") }}</title>
-  
-  <!-- フォントとCSS -->
   <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New&display=swap" rel="stylesheet">
   <style>
     body {
@@ -38,24 +37,23 @@
       font-size: 1rem;
     }
   </style>
-
-  <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     async function initializeLIFF() {
       try {
-        await liff.init({ liffId: "2007411501-PmxqWykX" });
-        await liff.ready;
-        const profile = await liff.getProfile();
-        document.getElementById("user_id").value = profile.userId;
+        await liff.init({ liffId: "YOUR_LIFF_ID" });
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        } else {
+          const profile = await liff.getProfile();
+          console.log("✅ LINE Profile:", profile);
+          document.getElementById("user_id").value = profile.userId;
+        }
       } catch (error) {
         console.error("LIFF initialization failed:", error);
       }
     }
-
-    window.onload = () => {
-      initializeLIFF();
-    };
+    window.onload = initializeLIFF;
   </script>
 </head>
 <body>
@@ -85,12 +83,10 @@
     <label for="available">{{ settings.form_label_available | default("稼働可能日・時間") }}</label>
     <input type="text" name="available" id="available" required>
 
-    <!-- カスタム項目のループ表示 -->
-  {% for field in settings.custom_fields or [] %}
-    <label for="{{ field.name }}">{{ field.label }}</label>
-    <input type="text" name="{{ field.name }}" id="{{ field.name }}">
-  {% endfor %}
-
+    {% for field in settings.custom_fields or [] %}
+      <label for="{{ field.name }}">{{ field.label }}</label>
+      <input type="text" name="{{ field.name }}" id="{{ field.name }}">
+    {% endfor %}
 
     <button type="submit">送信</button>
   </form>
