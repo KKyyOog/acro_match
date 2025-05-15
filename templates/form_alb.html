@@ -64,7 +64,7 @@
 
     <input type="hidden" name="user_id" id="user_id" value="">
 
-    <label for="name">お名前：</label>
+    <label for="name">{{ settings.form_label_name | default("お名前") }}</label>
     <input type="text" name="name" id="name" required>
 
     <label for="gym">体操経験：</label>
@@ -79,11 +79,18 @@
       <option value="なし">なし</option>
     </select>
 
-    <label for="area">希望エリア：</label>
+    <label for="area">{{ settings.form_label_area | default("希望エリア") }}</label>
     <input type="text" name="area" id="area" required>
 
-    <label for="available">稼働可能日・時間：</label>
+    <label for="available">{{ settings.form_label_available | default("稼働可能日・時間") }}</label>
     <input type="text" name="available" id="available" required>
+
+    <!-- カスタム項目のループ表示 -->
+  {% for field in settings.custom_fields or [] %}
+    <label for="{{ field.name }}">{{ field.label }}</label>
+    <input type="text" name="{{ field.name }}" id="{{ field.name }}">
+  {% endfor %}
+
 
     <button type="submit">送信</button>
   </form>
