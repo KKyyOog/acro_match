@@ -1,4 +1,17 @@
 {
-  "title": "アルバイト登録フォーム",
-  "button_color": "#06c755"
+  "title": "アルバイト登録",
+  "button_color": "#00cc66",
+  "form_label_name": "ニックネーム",
+  "form_label_area": "希望勤務地",
+  "form_label_available": "働ける曜日・時間",
+  "custom_fields": [
+    {
+      "label": "資格・スキル",
+      "name": "skills"
+    },
+    {
+      "label": "連絡可能時間帯",
+      "name": "contact_time"
+    }
+  ]
 }

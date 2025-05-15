@@ -6,32 +6,60 @@
 </head>
 <body>
   <h2>フォーム設定</h2>
+
   <form method="POST">
-  <label>タイトル:</label>
-  <input type="text" name="title" value="{{ settings.title }}"><br>
+    <!-- 基本設定 -->
+    <label>タイトル:</label>
+    <input type="text" name="title" value="{{ settings.title }}"><br>
 
-  <label>ボタンの色:</label>
-  <input type="color" name="button_color" value="{{ settings.button_color }}"><br>
+    <label>ボタンの色:</label>
+    <input type="color" name="button_color" value="{{ settings.button_color }}"><br>
 
-  <label>名前ラベル:</label>
-  <input type="text" name="form_label_name" value="{{ settings.form_label_name }}"><br>
+    <label>名前ラベル:</label>
+    <input type="text" name="form_label_name" value="{{ settings.form_label_name }}"><br>
 
-  <label>エリアラベル:</label>
-  <input type="text" name="form_label_area" value="{{ settings.form_label_area }}"><br>
+    <label>エリアラベル:</label>
+    <input type="text" name="form_label_area" value="{{ settings.form_label_area }}"><br>
 
-  <label>出勤可能日ラベル:</label>
-  <input type="text" name="form_label_available" value="{{ settings.form_label_available }}"><br>
+    <label>出勤可能日ラベル:</label>
+    <input type="text" name="form_label_available" value="{{ settings.form_label_available }}"><br>
 
-  <input type="submit" value="保存">
+    <!-- カスタム項目 -->
+<h3>カスタム項目の追加</h3>
+<div id="custom-fields">
+  {% for field in settings.custom_fields or [] %}
+    <div>
+      <input type="text" name="custom_label_{{ loop.index }}" value="{{ field.label }}" placeholder="ラベル">
+      <input type="text" name="custom_name_{{ loop.index }}" value="{{ field.name }}" placeholder="name属性">
+    </div>
+  {% endfor %}
+</div>
+
+<button type="button" onclick="addField()">＋ 項目を追加</button>
+<input type="hidden" name="custom_count" id="custom_count" value="{{ settings.custom_fields | length }}">
+
+<br><br>
+
+<!-- 教室フォーム設定 -->
+<h3>教室フォーム設定</h3>
+<label>教室フォームタイトル：</label>
+<input type="text" name="classroom_title" value="{{ settings.classroom_title }}"><br>
+
+<label>教室名ラベル：</label>
+<input type="text" name="form_label_classroom_name" value="{{ settings.form_label_classroom_name }}"><br>
+
+<label>場所ラベル：</label>
+<input type="text" name="form_label_classroom_location" value="{{ settings.form_label_classroom_location }}"><br>
+
+<label>募集日時ラベル：</label>
+<input type="text" name="form_label_classroom_date" value="{{ settings.form_label_classroom_date }}"><br>
+
+<label>希望する経験ラベル：</label>
+<input type="text" name="form_label_classroom_experience" value="{{ settings.form_label_classroom_experience }}"><br>
+
+<br><br>
+<button type="submit">保存</button>
 </form>
-<label>{{ settings.form_label_name }}</label>
-<input type="text" name="name"><br>
-
-<label>{{ settings.form_label_area }}</label>
-<input type="text" name="area"><br>
-
-<label>{{ settings.form_label_available }}</label>
-<input type="text" name="available"><br>
 
 </body>
 </html>
