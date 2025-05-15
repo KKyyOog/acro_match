@@ -28,7 +28,6 @@
       border-radius: 8px;
     }
     button {
-      background: {{ settings.button_color | default("#06c755") }};
       color: white;
       padding: 1rem;
       border: none;
@@ -83,7 +82,10 @@
       <input type="text" name="{{ field.name }}">
     {% endfor %}
 
-    <button type="submit">送信</button>
+    <button type="submit"
+      style="background: {{ settings.button_color | default('#06c755') }};">
+      送信
+    </button>
   </form>
 </body>
 </html>
