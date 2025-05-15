@@ -89,18 +89,20 @@ def ensure_headers_exist(sheet, base_headers, custom_fields):
         sheet.insert_row(expected_headers, 1)  # Insert new headers
 
 def find_matching_alb(sheet, area, experience_required, datetime_str):
-    """Find matching users based on area, experience, and availability."""
     all_rows = sheet.get_all_records()
     matched = []
     for row in all_rows:
-        if area in row.get("area", "") and datetime_str[:10] in row.get("available", ""):
-            if experience_required == "体操経験者" and row.get("gym") == "あり":
-                matched.append(row.get("user_id"))
-            elif experience_required == "チアリーディング可" and row.get("cheer") == "あり":
-                matched.append(row.get("user_id"))
-            elif experience_required == "補助可能":
-                matched.append(row.get("user_id"))
+        area_match = area in row.get("area", "")
+        date_match = datetime_str[:10] in row.get("available", "")
+        gym_match = experience_required == "体操経験者" and row.get("gym") == "あり"
+        cheer_match = experience_required == "チアリーディング可" and row.get("cheer") == "あり"
+        fallback_match = experience_required == "補助可能"
+
+        # いずれか1つでも一致すればマッチとみなす
+        if area_match or date_match or gym_match or cheer_match or fallback_match:
+            matched.append(row.get("user_id"))
     return matched
+
 
 # ------------------------ LINE通知 ------------------------
 
@@ -127,16 +129,14 @@ def line_notify(to, message):
 def notify_school():
     school_user_id = request.form.get("school_user_id")
     school_name = request.form.get("school_name")
-    
-    # 仮：ログインしたアルバイトの名前を取得（本来はセッションなどで）
-    # 今は固定値で仮対応
-    alb_name = "アルバイト（仮）"
 
     if school_user_id:
-        line_notify(school_user_id, f"{alb_name}さんが『{school_name}』の募集に興味を持っています！")
+        message = "案件に対して興味を示しているアルバイトがいます！ラインを交換しますか？"
+        line_notify(school_user_id, message)
         return "通知を送信しました。戻るボタンで一覧に戻ってください。"
     else:
         return "エラー：通知先が不明です", 400
+
 
 
 # ------------------------ 教室側 ------------------------

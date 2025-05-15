@@ -18,38 +18,30 @@
 
   <table>
     <thead>
-      <tr>
-        {% for header in headers %}
-          <th>{{ header }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in rows %}
-        <tr>
-          {% for cell in row %}
-            <td>{{ cell }}</td>
-          {% endfor %}
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</body>
+  <tr>
+    {% for header in headers[:-1] %}  <!-- user_idは非表示 -->
+      <th>{{ header }}</th>
+    {% endfor %}
+    <th>アクション</th>
+  </tr>
+</thead>
 <tbody>
   {% for row in rows %}
     <tr>
-      {% for cell in row %}
+      {% for cell in row[:-1] %}  <!-- user_id列を除いて表示 -->
         <td>{{ cell }}</td>
       {% endfor %}
       <td>
         <form action="/notify_school" method="POST">
-          <input type="hidden" name="school_user_id" value="{{ row[-1] }}">  <!-- 最後の列をLINE IDと仮定 -->
-          <input type="hidden" name="school_name" value="{{ row[0] }}">      <!-- 教室名 -->
+          <input type="hidden" name="school_user_id" value="{{ row[-1] }}">  <!-- user_idはformで送信 -->
+          <input type="hidden" name="school_name" value="{{ row[0] }}">
           <button type="submit">興味あり</button>
         </form>
       </td>
     </tr>
   {% endfor %}
 </tbody>
+
+
 
 </html>
